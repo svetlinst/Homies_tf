@@ -1,0 +1,31 @@
+docker image build -t web_app .
+
+docker run -d -p 80:80  --name web_app_container web_app
+
+docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=yourStrong(!)Password" -p 1433:1433 -v sqldata:/var/opt/mssql/sqlserver --name sqlserver -d mcr.microsoft.com/mssql/server:2022-latest
+
+az login
+
+az group create --name svetlinstoyanovhomiessrg --location westeurope
+
+az acr create --resource-group svetlinstoyanovhomiessrg --name svetlinstoyanovhomiesscr --sku Basic
+
+docker tag web_app svetlinstoyanovhomiesscr.azurecr.io/web_app
+
+az acr login --name svetlinstoyanovhomiesscr.azurecr.io/web_app
+
+docker push svetlinstoyanovhomiesscr.azurecr.io/web_app
+
+docker context create aci homiescontext
+
+docker context use homiescontext
+
+az storage account create --name homiesstorageccsvetlinst --resource-group svetlinstoyanovhomiessrg --location westeurope --sku Standard_LRS
+
+docker-compose up -d  
+
+
+
+------------------------------------------------------------------
+docker build --platform=linux/amd64 -t web_app:latest-amd64 .
+------------------------------------------------------------------
